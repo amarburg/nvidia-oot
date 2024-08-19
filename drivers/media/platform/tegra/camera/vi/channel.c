@@ -1124,6 +1124,13 @@ tegra_channel_enum_format(struct file *file, void *fh, struct v4l2_fmtdesc *f)
 	index -= 1;
 	f->pixelformat = tegra_core_get_fourcc_by_idx(chan, index);
 
+	if (f->pixelformat == V4L2_PIX_FMT_AVT_G4C2) {
+		const struct tegra_video_format *format = tegra_core_get_format_by_fourcc(chan, V4L2_PIX_FMT_AVT_G4C2);
+		memcpy(&f->description[0], &format->description[0], 32);
+	}
+
+	
+
 	return 0;
 }
 
@@ -2216,7 +2223,7 @@ static long tegra_channel_default_ioctl(struct file *file, void *fh,
 {
 	struct tegra_channel *chan = video_drvdata(file);
 	struct tegra_mc_vi *vi = chan->vi;
-	long ret = 0;
+	long ret = -ENOTTY;
 
 	if (vi->fops && vi->fops->vi_default_ioctl)
 		ret = vi->fops->vi_default_ioctl(file, fh, use_prio, cmd, arg);
