@@ -197,6 +197,15 @@ int vi5_priv_early_probe(struct platform_device *pdev)
 		dev_warn(dev, "Failed to set deferred dma buffer unmapping\n");
 #endif
 
+	//XXX:
+	// Override dma_coherent as a system with mostly coherent and some non 
+	// coherent devices is currently not supported by the kernel.
+	// https://forums.developer.nvidia.com/t/camera-vi-jp-6-0-r36-3-fixes-for-raw-image-corruption-line-artifacts-through-vi-mode/299834
+	if (device_property_read_bool(dev, "non-coherent")) {
+		dev_info(dev, "Overriding dma_coherent with false\n");
+		dev->dma_coherent = false;
+	}
+
 	return 0;
 
 put_vi:
