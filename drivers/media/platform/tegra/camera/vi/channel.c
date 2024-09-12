@@ -698,7 +698,7 @@ tegra_channel_queue_setup(struct vb2_queue *vq,
 	if (vi->fops && vi->fops->vi_setup_queue)
 		return vi->fops->vi_setup_queue(chan, nbuffers);
 	else
-		return -EINVAL;
+		return -EINVAL;		
 }
 
 int tegra_channel_alloc_buffer_queue(struct tegra_channel *chan,
@@ -706,13 +706,15 @@ int tegra_channel_alloc_buffer_queue(struct tegra_channel *chan,
 {
 	struct device *vi_unit_dev = tegra_channel_get_vi_unit(chan);
 
-	chan->buffer_state = devm_kzalloc(vi_unit_dev,
-		(num_buffers * sizeof(*chan->buffer_state)), GFP_KERNEL);
+	chan->buffer_state = devm_krealloc(vi_unit_dev, chan->buffer_state,
+		(num_buffers * sizeof(*chan->buffer_state)),
+		GFP_KERNEL | __GFP_ZERO);
 	if (!chan->buffer_state)
 		goto alloc_error;
 
-	chan->buffers = devm_kzalloc(vi_unit_dev,
-		(num_buffers * sizeof(*chan->buffers)), GFP_KERNEL);
+	chan->buffers = devm_krealloc(vi_unit_dev, chan->buffers,
+		(num_buffers * sizeof(*chan->buffers)),
+		GFP_KERNEL | __GFP_ZERO);
 	if (!chan->buffers)
 		goto alloc_error;
 
@@ -1123,6 +1125,13 @@ tegra_channel_enum_format(struct file *file, void *fh, struct v4l2_fmtdesc *f)
 
 	index -= 1;
 	f->pixelformat = tegra_core_get_fourcc_by_idx(chan, index);
+
+	if (f->pixelformat == V4L2_PIX_FMT_AVT_G4C2) {
+		const struct tegra_video_format *format = tegra_core_get_format_by_fourcc(chan, V4L2_PIX_FMT_AVT_G4C2);
+		memcpy(&f->description[0], &format->description[0], 32);
+	}
+
+	
 
 	return 0;
 }
@@ -2216,7 +2225,7 @@ static long tegra_channel_default_ioctl(struct file *file, void *fh,
 {
 	struct tegra_channel *chan = video_drvdata(file);
 	struct tegra_mc_vi *vi = chan->vi;
-	long ret = 0;
+	long ret = -ENOTTY;
 
 	if (vi->fops && vi->fops->vi_default_ioctl)
 		ret = vi->fops->vi_default_ioctl(file, fh, use_prio, cmd, arg);

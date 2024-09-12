@@ -318,6 +318,10 @@ int vi_capture_setup(
 struct tegra_vi_channel *get_tegra_vi_channel(
 	unsigned int stream_id,
 	unsigned int virtual_channel_id);
+
+
+void vi_capture_abort(struct tegra_vi_channel *chan);
+
 /**
  * @brief Reset an opened VI channel, all pending capture requests to RCE are
  * discarded.
@@ -431,7 +435,7 @@ int vi_capture_request(
  *
  * @param[in]	chan		VI channel context
  * @param[in]	timeout_ms	Time to wait for status completion [ms], set to
- *				0 for indefinite
+ *				a negative value for indefinite
  *
  * @returns	0 (success), neg. errno (failure)
  */
