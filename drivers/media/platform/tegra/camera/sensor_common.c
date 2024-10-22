@@ -267,6 +267,16 @@ static int extract_pixel_format(
 		*format = V4L2_PIX_FMT_UYVY;
 	else if (strncmp(pixel_t, "yuv_vyuy16", size) == 0)
 		*format = V4L2_PIX_FMT_VYUY;
+	else if (strncmp(pixel_t, "gray", size) == 0)
+		*format = V4L2_PIX_FMT_GREY;
+	else if (strncmp(pixel_t, "y10", size) == 0)
+		*format = V4L2_PIX_FMT_Y10;
+	else if (strncmp(pixel_t, "y12", size) == 0)
+		*format = V4L2_PIX_FMT_Y12;
+        else if (strncmp(pixel_t, "y14", size) == 0)
+		*format = V4L2_PIX_FMT_Y14;
+	else if (strncmp(pixel_t, "bayer_rggb8", size) == 0)
+		*format = V4L2_PIX_FMT_SRGGB8;
 	else {
 		pr_err("%s: Need to extend format%s\n", __func__, pixel_t);
 		return -EINVAL;
@@ -285,6 +295,20 @@ static int sensor_common_parse_image_props(
 	int depth;
 	char pix_format[24];
 	u32 value = 0;
+
+	err = read_property_u32(node, "active_l",
+		&image->left);
+	if (err) {
+		dev_err(dev, "%s:active_l property missing\n", __func__);
+		goto fail;
+	}
+
+	err = read_property_u32(node, "active_t",
+		&image->top);
+	if (err) {
+		dev_err(dev, "%s:active_t property missing\n", __func__);
+		goto fail;
+	}
 
 	err = read_property_u32(node, "active_w",
 		&image->width);

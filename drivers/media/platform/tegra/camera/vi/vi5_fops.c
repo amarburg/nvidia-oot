@@ -39,7 +39,7 @@
 #define VI_CHANNEL_DEV "/dev/capture-vi-channel"
 #define VI_CHAN_PATH_MAX 40
 
-#define CAPTURE_TIMEOUT_MS	2500
+#define CAPTURE_TIMEOUT_MS	5000
 
 static const struct vi_capture_setup default_setup = {
 	.channel_flags = 0
@@ -553,11 +553,11 @@ static void vi5_capture_dequeue(struct tegra_channel *chan,
 				dev_err(vi->dev, "uncorr_err: flags %d, err_data %d\n",
 					descr->status.flags, descr->status.err_data);
 			} else {
-				dev_warn(vi->dev,
-					"corr_err: discarding frame %d, flags: %d, "
-					"err_data %d\n",
-					descr->status.frame_id, descr->status.flags,
-					descr->status.err_data);
+//				dev_warn(vi->dev,
+//					"corr_err: discarding frame %d, flags: %d, "
+//					"err_data %d\n",
+//					descr->status.frame_id, descr->status.flags,
+//					descr->status.err_data);
 				frame_err = true;
 			}
 		} else if (!vi_port) {
